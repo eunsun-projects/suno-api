@@ -1,0 +1,11 @@
+onlyBuiltDependencies:
+  - '@playwright/browser-chromium'
+  - '@scarf/scarf'
+  - '@tree-sitter-grammars/tree-sitter-yaml'
+  - bufferutil
+  - core-js-pure
+  - electron
+  - tree-sitter
+  - tree-sitter-json
+  - unrs-resolver
+  - utf-8-validate

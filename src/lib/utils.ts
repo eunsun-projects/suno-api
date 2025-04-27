@@ -1,5 +1,5 @@
-import pino from "pino";
-import { Page } from "rebrowser-playwright-core";
+import pino from 'pino';
+import type { Page } from 'playwright';
 
 const logger = pino();
 
@@ -18,24 +18,29 @@ export const sleep = (x: number, y?: number): Promise<void> => {
   // console.log(`Sleeping for ${timeout / 1000} seconds`);
   logger.info(`Sleeping for ${timeout / 1000} seconds`);
 
-  return new Promise(resolve => setTimeout(resolve, timeout));
-}
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+};
 
 /**
  * @param target A Locator or a page
- * @returns {boolean} 
+ * @returns {boolean}
  */
+
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export const isPage = (target: any): target is Page => {
   return target.constructor.name === 'Page';
-}
+};
 
 /**
  * Waits for an hCaptcha image requests and then waits for all of them to end
  * @param page
  * @param signal `const controller = new AbortController(); controller.status`
- * @returns {Promise<void>} 
+ * @returns {Promise<void>}
  */
-export const waitForRequests = (page: Page, signal: AbortSignal): Promise<void> => {
+export const waitForRequests = (
+  page: Page,
+  signal: AbortSignal
+): Promise<void> => {
   return new Promise((resolve, reject) => {
     const urlPattern = /^https:\/\/img[a-zA-Z0-9]*\.hcaptcha\.com\/.*$/;
     let timeoutHandle: NodeJS.Timeout | null = null;
@@ -49,8 +54,7 @@ export const waitForRequests = (page: Page, signal: AbortSignal): Promise<void> 
     };
 
     const resetTimeout = () => {
-      if (timeoutHandle)
-        clearTimeout(timeoutHandle);
+      if (timeoutHandle) clearTimeout(timeoutHandle);
       if (activeRequestCount === 0) {
         timeoutHandle = setTimeout(() => {
           cleanupListeners();
@@ -63,8 +67,7 @@ export const waitForRequests = (page: Page, signal: AbortSignal): Promise<void> 
       if (urlPattern.test(request.url())) {
         requestOccurred = true;
         activeRequestCount++;
-        if (timeoutHandle)
-          clearTimeout(timeoutHandle);
+        if (timeoutHandle) clearTimeout(timeoutHandle);
       }
     };
 
@@ -101,18 +104,17 @@ export const waitForRequests = (page: Page, signal: AbortSignal): Promise<void> 
     const onAbort = () => {
       cleanupListeners();
       clearTimeout(initialTimeout);
-      if (timeoutHandle)
-        clearTimeout(timeoutHandle);
+      if (timeoutHandle) clearTimeout(timeoutHandle);
       signal.removeEventListener('abort', onAbort);
       reject(new Error('AbortError'));
     };
 
     signal.addEventListener('abort', onAbort, { once: true });
-  }); 
-}
+  });
+};
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-}
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+};
